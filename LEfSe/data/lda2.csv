@@ -1,0 +1,6 @@
+物种,比较组,LDA值,P值,属
+Bacteria.Firmicutes.Clostridia.Clostridiales.Ruminococcaceae.Pseudoflavonifractor,C,3.017095459,0.023785238,Pseudoflavonifractor
+Bacteria.Firmicutes.Clostridia.Clostridiales.Eubacteriaceae.Eubacterium,C,2.81843509,0.048993495,Eubacterium
+Bacteria.Firmicutes.Clostridia.Clostridiales.Ruminococcaceae.Sporobacter,C,2.389222713,0.035372161,Sporobacter
+Bacteria.Firmicutes.Clostridia.Clostridiales.Ruminococcaceae.Intestinimonas,C,2.205751253,0.009514254,Intestinimonas
+Bacteria.Actinobacteria.Actinobacteria.Actinomycetales.Mycobacteriaceae.Mycobacterium,C,2.134077769,0.015224349,Mycobacterium

@@ -1,0 +1,165 @@
+library(data.table)
+library(GUniFrac)
+library(ade4)
+library(vegan)
+library(purrr)
+
+# uwt = fread("~/data/beta/a-b-c-d.weighted_unifrac.coordinate.xls")
+dis = fread("~/data/beta/weighted_unifrac_a-b-c-d.matrix")
+
+# group = rio::import("~/data/beta/分组及编号.xlsx")
+group = rio::import("~/data/新的分组及编号.xlsx")
+group = as.data.table(group)
+names(group) = c("old", "raw", "new")
+
+
+# goal = c("B", "NB", "D")
+# goal = c("C", "NC", "D")
+
+# indics = group[new %in% goal, old]
+# dis = dis[order(sample)][sample %in% indics, ..indics]
+
+index = sort(names(dis)[-1])
+index
+dist = dis[order(sample)][, ..index]
+
+dist = as.matrix(dist)
+row.names(dist) = index
+
+groups = substr(index, 1, 1)
+# groups = as.factor(group[old %in% indics, new])
+
+groups = as.factor(groups)
+
+test = adonis3(as.dist(dist) ~ groups)
+print(test)
+p = test$aov.tab$`Pr(>F)`[1]
+
+# test = anosim(dist, groups, permutations = 999, distance = "bray", strata = NULL, parallel = getOption("mc.cores"))
+# print(test)
+# png("anosim.test.png", width = 960, height = 960)
+# plot(test, xlab = "groups", ylab = "")
+# dev.off()
+
+res = pcoa(dist)
+result = res$values[, "Relative_eig"]
+pro1 = as.numeric(sprintf("%.4f", result[1])) * 100
+pro2 = as.numeric(sprintf("%.4f", result[2])) * 100
+
+# 权重矩阵
+fac = groups
+dfdistri <- ade4:::fac2disj(fac) * rep(1, length(fac))
+
+# col = rep(1, length(levels(fac)))
+coul <- rep(1, length(levels(fac)))
+
+w1 <- unlist(lapply(dfdistri, sum))
+dfdistri <- t(t(dfdistri) / w1)
+
+# x yax 1,2
+coox <- as.matrix(t(dfdistri)) %*% dfxy[, 1]
+cooy <- as.matrix(t(dfdistri)) %*% dfxy[, 2]
+
+# 计算边界
+
+source("get_ellipse.R")
+es = list()
+for (i in 1:ncol(dfdistri)) {
+  es[[i]] = get_ellipse(res$vectors[, 1], res$vectors[, 2], dfdistri[, i],
+                        cellipse = 1.5, axesell = TRUE, coul = "black")
+}
+
+xs = map(es, "x")
+xs = range(unlist(xs)) * 1.05
+
+ys = map(es, "y")
+ys = range(unlist(ys)) * 1.05
+
+plot.new()
+plot.window(xlim = xs, ylim = ys, xlab = "x")
+plot(x = res$vectors[, 1], y = res$vectors[, 2])
+scatterutil.base(res$vectors, xax = 1, yax = 2, xlim = NULL, ylim = NULL,
+                 include.origin = TRUE, grid = TRUE, origin = c(0, 0), 
+                 pixmap = NULL, contour = NULL, area = NULL, add.plot = TRUE,
+                 addaxes = TRUE, csub = 1, sub = "")
+
+scatterutil.ellipse()
+
+library(ade4)
+library(GUniFrac)
+library(ade4)
+library(vegan)
+
+dfxy = data.frame(res$vectors)
+# data.frame comp 1 comp 2
+# dfxy <- data.frame(dfxy)
+
+# fac groups
+
+
+
+
+
+
+
+axesell = TRUE
+if (nrow(dfxy) != nrow(dfdistri))
+  stop(paste("Non equal row numbers", nrow(dfxy), nrow(dfdistri)))
+
+coo <- scatterutil.base(dfxy = dfxy, xax = 1, yax = 2,
+  xlim = NULL, ylim = NULL, grid = TRUE, addaxes = TRUE,
+  cgrid = 1, include.origin = TRUE, origin = c(0, 0),
+  sub = "", csub = 1, possub = "bottomleft", pixmap = NULL,
+  contour = NULL, area = NULL, add.plot = FALSE)
+cpoint = 1
+pch = 20
+if (cpoint > 0)
+  for (i in 1:ncol(dfdistri)) {
+    pch <- rep(pch, length = nrow(dfxy))
+    points(coo$x[dfdistri[, i] > 0], coo$y[dfdistri[,
+      i] > 0], pch = pch[dfdistri[, i] > 0], cex = par("cex") *
+      cpoint, col = coul[i])
+  }
+cstar = 1
+if (cstar > 0)
+  for (i in 1:ncol(dfdistri)) {
+    scatterutil.star(coo$x, coo$y, dfdistri[, i], cstar = cstar,
+      coul[i])
+  }
+cellipse = 1.5
+if (cellipse > 0)
+  for (i in 1:ncol(dfdistri)) {
+    scatterutil.ellipse(coo$x, coo$y, dfdistri[, i],
+      cellipse = cellipse, axesell = axesell, coul[i])
+  }
+clabel = 1
+label = letters[1:4]
+if (clabel > 0)
+  scatterutil.eti(coox, cooy, label, clabel, coul = rainbow(4))
+box()
+invisible(match.call())
+
+
+get_ellipse(res$vectors[, 1], res$vectors[, 2], groups, axesell = 1.5)
+
+plot.new()
+ellipse = list()
+for (i in 1:ncol(dfdistri)) {
+  ellipse[[i]] = scatterutil.ellipse(coo$x, coo$y, dfdistri[, i],
+                      cellipse = cellipse, axesell = axesell, coul[i])
+}
+plot(x = res$vectors[, 1] * 1.05,
+     y = res$vectors[, 2] * 1.05, col = "white",
+     xlab = glue::glue("PCoA1 {pro1}%"), ylab = glue::glue("PCoA2 {pro2}%"),
+     cex.lab = 1.35)
+abline(v = -4:5 / 10, h = -2:6 / 10, col = "gray75")
+abline(h = 0, v = 0)
+s.class(res$vectors[, 1:2], fac = groups, clabel = 1.5,
+        label = c("AR", "Asthma", "Asthma + AR", "HC"),
+        col = c("darkblue", "darkgreen", "darkorchid4", "#ff0800"),
+        # col = c("darkblue", "darkgreen", "#ff0800"),
+        add.plot = TRUE)
+text(x = -0.5, y = -0.25,
+     adj = c(0, 0),
+     labels = glue::glue("p.value = {p}"),
+     cex = 1.5)

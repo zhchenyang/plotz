@@ -1,0 +1,26 @@
+{
+    "id": "E89068AD",
+    "path": "~/workspace/plotz/PCoA/sclass.R",
+    "project_path": "sclass.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1626678539797.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "97,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1626685530,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1626685530,
+    "read_only": false,
+    "read_only_alternatives": []
+}
